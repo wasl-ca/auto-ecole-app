@@ -1,8 +1,8 @@
 import { useContext, useEffect, useState } from "react";
-import { AuthContext } from "../context/AuthContext";
+import { useAppContext } from "../context/AppContext";
 
 const ExamsPage = () => {
-  const { token } = useContext(AuthContext);
+  const { token } = useAppContext();
   const [exams, setExams] = useState([]);
 
   useEffect(() => {

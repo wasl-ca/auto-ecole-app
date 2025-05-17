@@ -5,13 +5,14 @@ import Students from "./pages/Students";
 import Exams from "./pages/Exams";
 import Login from "./pages/Login";
 import ProtectedRoute from "./components/ProtectedRoute";
+import ManageUsers from "./pages/ManageUsers";
 
 export default function App() {
   return (
     <Router>
       <Navbar />
       <Routes>
-        <Route path="/" element={<Dashboard />} />
+        <Route path="/" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
         <Route
           path="/students"
           element={
@@ -20,12 +21,17 @@ export default function App() {
             </ProtectedRoute>
           }
         />
-        <Route path="/exams" element={<Exams />} />
-        import Login from "./pages/Login";
+        <Route path="/exams" element={<ProtectedRoute><Exams /></ProtectedRoute>} />
 
         <Route path="/login" element={<Login />} />
-
-        {/* Add routes for /students and /exams */}
+        <Route
+          path="/admin/users"
+          element={
+            <ProtectedRoute>
+              <ManageUsers />
+            </ProtectedRoute>
+          }
+        />
       </Routes>
     </Router>
   );

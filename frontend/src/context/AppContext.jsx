@@ -1,0 +1,87 @@
+import React, { createContext, useEffect, useState } from "react";
+import axios from "axios";
+
+export const AppContext = createContext();
+const api = axios.create({
+  baseURL: import.meta.env.VITE_APP_API_URL,
+  headers: { "Content-Type": "application/json" },
+});
+
+export const AppProvider = ({ children }) => {
+  const [token, setToken] = useState(localStorage.getItem("token") || "");
+  const [user, setUser] = useState(null);
+  const [students, setStudents] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  const fetchStudents = async () => {
+    try {
+      const config = { headers: { Authorization: `Bearer ${token}` } };
+
+      const studentRes = await api.get("/students", config);
+
+      setStudents(studentRes.data);
+    } catch (err) {
+      console.error("Failed to load students", err);
+      logout(); // optional: auto logout if token is invalid
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (token) {
+      fetchStudents();
+    } else {
+      setLoading(false);
+    }
+  }, [token]);
+
+  const login = async (username, password) => { 
+    
+    const res = await api.post("/auth/login", { username, password });
+    if (res.status !== 200) {
+      throw new Error("Login failed");
+    }
+  
+    const data = await res.data;
+    if (data.token) {
+      localStorage.setItem("token", data.token);
+      setToken(data.token);
+    }
+    const config = { headers: { Authorization: `Bearer ${data.token}` }, body  : { username } };
+    const userRes = await api.get("/auth/me", config);
+    setUser(userRes.data);
+    return data;
+  };
+
+  const logout = () => {
+    localStorage.removeItem("token");
+    setToken("");
+    setUser(null);
+    setStudents([]);
+  };
+
+  return (
+    <AppContext.Provider
+      value={{
+        token,
+        user,
+        students,
+        loading,
+        login,
+        logout,
+        setStudents, // optional to allow manual update
+      }}
+    >
+      {children}
+    </AppContext.Provider>
+  );
+};
+
+export const useAppContext = () => {
+  const context = React.useContext(AppContext);
+  if (!context) {
+    throw new Error("useAppContext must be used within an AppProvider");
+  }
+  return context;
+};
