@@ -1,34 +1,50 @@
-import { useContext, useEffect, useState } from "react";
 import { useAppContext } from "../context/AppContext";
 
 const ExamsPage = () => {
-  const { token } = useAppContext();
-  const [exams, setExams] = useState([]);
-
-  useEffect(() => {
-    if (!token) return;
-
-    fetch(`${process.env.REACT_APP_API_URL}/attt/exams`, {
-      headers: {
-        Authorization: `Bearer ${token}`
-      }
-    })
-      .then(res => res.json())
-      .then(data => setExams(data))
-      .catch(err => console.error("Error fetching exams", err));
-  }, [token]);
+  const { exams , loading } = useAppContext();
 
   return (
-    <div>
-      <h2>Driving Exam Dates</h2>
-      <ul>
-        {exams.map((exam, i) => (
-          <li key={i}>{exam.date} – {exam.location} – {exam.availableSeats} seats</li>
-        ))}
-      </ul>
+    <div className="p-6">
+      <h1 className="text-2xl font-bold mb-4">Exam Schedule</h1>
+
+      {loading ? (
+        <p>Loading...</p>
+      ) : exams.length === 0 ? (
+        <p>No exams available.</p>
+      ) : (
+        <table className="min-w-full bg-white border rounded shadow-md">
+          <thead>
+            <tr className="bg-gray-200">
+              <th className="py-2 px-4 border-b">Date</th>
+              <th className="py-2 px-4 border-b">Location</th>
+              <th className="py-2 px-4 border-b">Type</th>
+              <th className="py-2 px-4 border-b">Status</th>
+              <th className="py-2 px-4 border-b">Registered Students</th>
+            </tr>
+          </thead>
+          <tbody>
+            {exams.map((exam) => (
+              <tr key={exam._id}>
+                <td className="py-2 px-4 border-b">
+                  {new Date(exam.date).toLocaleDateString()}
+                </td>
+                <td className="py-2 px-4 border-b">{exam.location}</td>
+                <td className="py-2 px-4 border-b capitalize">
+                  {exam.examType}
+                </td>
+                <td className="py-2 px-4 border-b capitalize">
+                  {exam.examStatus}
+                </td>
+                <td className="py-2 px-4 border-b">
+                  {exam.registeredStudents.length}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      )}
     </div>
   );
 };
 
 export default ExamsPage;
-// Compare this snippet from frontend/src/context/AppContext.js:

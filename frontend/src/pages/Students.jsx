@@ -1,45 +1,82 @@
 import { useAppContext } from "../context/AppContext";
+import AddStudentModal from "../components/AddStudentModal";
+import { useEffect, useState } from "react";
 
 export default function Students() {
-  const { students, isLoading, registerStudentToExam } = useAppContext();
+  const { students, loading, fetchStudents } = useAppContext();
+  const [showModal, setShowModal] = useState(false);
 
-  const handleRegister = async (studentId) => {
-    try {
-      const result = await registerStudentToExam(studentId, "driving");
-      alert(`Student registered! ✅`);
-    } catch (err) {
-      alert("❌ Registration failed");
-    }
-  };
-
+  const handleOpenModal = () => setShowModal(true);
+  const handleCloseModal = () => setShowModal(false);
+  useEffect(() => {
+    fetchStudents();
+  }, []);
   return (
-    <div className="p-6">
-      <h1 className="text-2xl font-bold mb-4">📋 Student List</h1>
+    <div className="p-4">
+      <div className="flex justify-between items-center mb-4">
+        <h1 className="text-2xl font-bold mb-4">Students</h1>
+        <button
+          className="bg-blue-600 text-white px-4 py-2 rounded-xl"
+          onClick={handleOpenModal}
+        >
+          + Add Student
+        </button>
+      </div>
+      {/* Modal */}
 
-      {isLoading ? (
-        <p>Loading...</p>
+      {loading ? (
+        <p>Loading students...</p>
       ) : students.length === 0 ? (
-        <p>No students available.</p>
+        <p>No students found.</p>
       ) : (
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-          {students.map((student) => (
-            <div
-              key={student._id}
-              className="bg-white shadow-md rounded-xl p-4 border"
-            >
-              <h2 className="text-lg font-semibold">{student.name}</h2>
-              <p>Email: {student.email}</p>
-              <p>Status: {student.examRegistered ? "✅ Registered" : "❌ Not registered"}</p>
-
-              <button
-                className="mt-3 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 disabled:opacity-50"
-                disabled={student.examRegistered}
-                onClick={() => handleRegister(student._id)}
-              >
-                {student.examRegistered ? "Already Registered" : "Register to Exam"}
-              </button>
-            </div>
-          ))}
+        <div className="overflow-x-auto">
+          <table className="min-w-full bg-white border rounded shadow-md">
+            <thead className="bg-gray-100">
+              <tr>
+                <th className="py-2 px-4 border-b">Full Name</th>
+                <th className="py-2 px-4 border-b">CIN</th>
+                <th className="py-2 px-4 border-b">Phone</th>
+                <th className="py-2 px-4 border-b">Exam Type</th>
+                <th className="py-2 px-4 border-b">Preferred Date</th>
+                <th className="py-2 px-4 border-b">Preferred Location</th>
+                <th className="py-2 px-4 border-b">Registered?</th>
+              </tr>
+            </thead>
+            <tbody>
+              {students.map((student) => (
+                <tr key={student._id} className="hover:bg-gray-50">
+                  <td className="py-2 px-4 border-b">{student.fullName}</td>
+                  <td className="py-2 px-4 border-b">{student.cin}</td>
+                  <td className="py-2 px-4 border-b">{student.phone}</td>
+                  <td className="py-2 px-4 border-b capitalize">
+                    {student.examType}
+                  </td>
+                  <td className="py-2 px-4 border-b">
+                    {student.prefferredExamDate
+                      ? new Date(
+                          student.prefferredExamDate
+                        ).toLocaleDateString()
+                      : "—"}
+                  </td>
+                  <td className="py-2 px-4 border-b">
+                    {student.prefferredExamLocation || "—"}
+                  </td>
+                  <td className="py-2 px-4 border-b">
+                    {student.examRegistered ? (
+                      <span className="text-green-600 font-semibold">
+                        ✔ Yes
+                      </span>
+                    ) : (
+                      <span className="text-red-500 font-semibold">✘ No</span>
+                    )}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+          {showModal && (
+            <AddStudentModal open={showModal} onClose={handleCloseModal} />
+          )}
         </div>
       )}
     </div>

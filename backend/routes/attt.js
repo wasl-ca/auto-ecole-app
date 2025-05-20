@@ -9,7 +9,7 @@ router.get("/exams", async (req, res) => {
 
     res.json(exams);
   } catch (err) {
-    res.status(500).json({ error: "ATTT scraping failed" });
+    res.status(500).json({ error: "ATTT scraping failed. "+ err.message });
   }
 });
 

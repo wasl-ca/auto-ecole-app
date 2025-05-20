@@ -12,6 +12,7 @@ export const AppProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [students, setStudents] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [exams, setExams] = useState([]);
 
   const fetchStudents = async () => {
     try {
@@ -28,9 +29,25 @@ export const AppProvider = ({ children }) => {
     }
   };
 
+  const fetchExams = async () => {
+    try {
+      const config = { headers: { Authorization: `Bearer ${token}` } };
+
+      const examRes = await api.get("/exams", config);
+
+      setExams(examRes.data);
+    } catch (err) {
+      console.error("Failed to load exams", err);
+      logout(); // optional: auto logout if token is invalid
+    } finally {
+      setLoading(false);
+    }
+  }
+
   useEffect(() => {
     if (token) {
       fetchStudents();
+      fetchExams();
     } else {
       setLoading(false);
     }
@@ -68,9 +85,10 @@ export const AppProvider = ({ children }) => {
         user,
         students,
         loading,
+        exams,
         login,
-        logout,
-        setStudents, // optional to allow manual update
+        logout, 
+        fetchStudents
       }}
     >
       {children}

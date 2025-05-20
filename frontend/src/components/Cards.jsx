@@ -1,7 +1,10 @@
+import { useAppContext } from "../context/AppContext";
+
 export default function DashboardCards() {
+  const { students, exams } = useAppContext();
     const stats = [
-      { label: "Total Students", icon: "🎓", value: 45 },
-      { label: "Available Exams", icon: "📅", value: 6 },
+      { label: "Total Students", icon: "🎓", value: students.length },
+      { label: "Available Exams", icon: "📅", value: exams.length },
       { label: "Recent Registrations", icon: "📝", value: 3 },
     ];
   
