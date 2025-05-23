@@ -9,7 +9,9 @@ const api = axios.create({
 
 export const AppProvider = ({ children }) => {
   const [token, setToken] = useState(localStorage.getItem("token") || "");
+  const [menu, setMenu] = useState([]);
   const [user, setUser] = useState(null);
+  const [username, setUsername] = useState("");
   const [students, setStudents] = useState([]);
   const [loading, setLoading] = useState(true);
   const [exams, setExams] = useState([]);
@@ -44,17 +46,32 @@ export const AppProvider = ({ children }) => {
     }
   }
 
+  const fetchMenu = async () => {
+    try {
+      const config = {
+        headers: { Authorization: `Bearer ${token}` },
+        body: { username },
+      };
+      const menuRes = await api.get("/auth/menu", config);
+      setMenu(menuRes.data.menu);
+    } catch (err) {
+      console.error("Failed to load menu", err);
+      logout(); // optional: auto logout if token is invalid
+    }
+  };
+
   useEffect(() => {
     if (token) {
       fetchStudents();
       fetchExams();
+      fetchMenu(username);
     } else {
       setLoading(false);
     }
   }, [token]);
 
   const login = async (username, password) => { 
-    
+    setUsername(username);
     const res = await api.post("/auth/login", { username, password });
     if (res.status !== 200) {
       throw new Error("Login failed");
@@ -71,11 +88,14 @@ export const AppProvider = ({ children }) => {
     return data;
   };
 
+
+
   const logout = () => {
     localStorage.removeItem("token");
     setToken("");
     setUser(null);
     setStudents([]);
+    setMenu([]);
   };
 
   return (
@@ -86,6 +106,7 @@ export const AppProvider = ({ children }) => {
         students,
         loading,
         exams,
+        menu,
         login,
         logout, 
         fetchStudents

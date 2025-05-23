@@ -3,7 +3,7 @@ const Student = require("../models/Student");
 
 exports.getExams = async (req, res) => {
   try {
-    const exams = await Exam.find().populate("registeredStudents");
+    const exams = await Exam.find({ examStatus : "available"}).populate("registeredStudents");
     res.json(exams);
   } catch (err) {
     res.status(500).json({ error: "Failed to fetch exams" });

@@ -1,7 +1,10 @@
 const puppeteer = require("puppeteer-extra");
+
 const StealthPlugin = require("puppeteer-extra-plugin-stealth");
 
 puppeteer.use(StealthPlugin());
+
+const { getLocation, getExamType, parseDateTime } = require("../utils/formatter");
 
 const ATTT_URL = "https://www.attt.com.tn/autoecole.php";
 const PROFILE_URL = "https://www.attt.com.tn/autoecole.php?code_menu=74";
@@ -57,7 +60,8 @@ async function loginAndFetchExams() {
     await browser.close();
     // format the field to match the model exam
     const formattedExams = exams.map((exam) => ({
-      date: parseDateTime(exam.date),
+      date: parseDateTime(exam.date).datePart,
+      time: parseDateTime(exam.date).timePart,
       location: getLocation(exam.location),
       examType: getExamType(exam.location),
       examStatus: "available",
@@ -70,48 +74,7 @@ async function loginAndFetchExams() {
     throw err;
   }
 }
-function getLocation(location) {
-  const locationMap = {
-    Zarzis: "Zarzis",
-    Medenine: "Medenine",
-    Mednine: "Medenine",
-    "Ben Guerdane": "Ben Guerdane",
-    Jerba: "Jerba",
-    "B.GUERDANE": "Ben Guerdane",
-    Midoun: "Midoun",
-    "Houmet Souk": "Houmet Souk",
-    // Add more locations as needed
-  };
-  if (!location) return "";
-  const keys = Object.keys(locationMap);
-  const foundKey = keys.find((key) =>
-    location.toLowerCase().includes(key.toLowerCase())
-  );
-  if (foundKey) return locationMap[foundKey];
-  return locationMap[location] || location;
-}
-function getExamType(examType) {
-  const examTypeMap = {
-    code: "code",
-    circulation: "circulation",
-    manoeuvre: "manoeuvre",
-    manoeuvres: "manoeuvre",
-    extension: "extension",
-    // Add more exam types as needed
-  };
-  if (!examType) return "";
-  const keys = Object.keys(examTypeMap);
-  const foundKey = keys.find((key) =>
-    examType.toLowerCase().includes(key.toLowerCase())
-  );
-  if (foundKey) return examTypeMap[foundKey];
-  return examTypeMap[examType] || examType;
-}
-function parseDateTime(str) {
-  const [datePart, timePart] = str.split(" ");
-  const [day, month, year] = datePart.split("/");
-  return new Date(`${year}-${month}-${day}T${timePart}`);
-}
+
 module.exports = {
   loginAndFetchExams,
 };

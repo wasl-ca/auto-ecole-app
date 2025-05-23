@@ -1,10 +1,13 @@
 import { useState } from "react";
 import { useAppContext } from "../context/AppContext";
 import { useNavigate } from "react-router-dom";
+import { showSuccess } from "../lib/toast";
+import { useTranslation } from "react-i18next";
 
 export default function Login() {
   const { login } = useAppContext();
   const navigate = useNavigate();
+  const { t } = useTranslation();
 
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
@@ -19,13 +22,14 @@ export default function Login() {
       const user = await login(username, password);
       setError(""); // clear any previous error
       if (!user) {
-        setError("Invalid username or password");
+        setError(t("error_login_failed_0"));
         return;
       }
       // Assuming login returns user data
+      showSuccess(t("message_login_success"));
       navigate("/"); // redirect to dashboard
     } catch (err) {
-      setError(err.message || "Login failed");
+      setError(t("error_login_failed_1", { error: err.message }));
     }
     finally {
       setLoading(false);
@@ -62,14 +66,18 @@ export default function Login() {
           onSubmit={handleSubmit}
           className="bg-white shadow-lg rounded-xl p-8 w-full max-w-md"
         >
-          <h1 className="text-2xl font-bold mb-6 text-center">🔐 Login</h1>
+          <h1 className="text-2xl font-bold mb-6 text-center">
+            🔐 {t("login")}
+          </h1>
 
           {error && (
             <div className="mb-4 text-red-600 text-sm text-center">{error}</div>
           )}
 
           <div className="mb-4">
-            <label className="block text-sm font-semibold">Username</label>
+            <label className="block text-sm font-semibold">
+              {t("username")}
+            </label>
             <input
               type="text"
               className="w-full px-3 py-2 border rounded-md focus:outline-none"
@@ -80,7 +88,9 @@ export default function Login() {
           </div>
 
           <div className="mb-6">
-            <label className="block text-sm font-semibold">Password</label>
+            <label className="block text-sm font-semibold">
+              {t("password")}
+            </label>
             <input
               type="password"
               className="w-full px-3 py-2 border rounded-md focus:outline-none"
@@ -94,7 +104,7 @@ export default function Login() {
             type="submit"
             className="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700"
           >
-            Sign In
+            {t("sign_in")}
           </button>
         </form>
       )}

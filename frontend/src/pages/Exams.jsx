@@ -1,8 +1,9 @@
 import { useAppContext } from "../context/AppContext";
 
 const ExamsPage = () => {
-  const { exams , loading } = useAppContext();
-
+  const { exams, loading } = useAppContext();
+  const sortedExams = exams.sort((a, b) => new Date(a.date) - new Date(b.date));
+  
   return (
     <div className="p-6">
       <h1 className="text-2xl font-bold mb-4">Exam Schedule</h1>
@@ -16,6 +17,7 @@ const ExamsPage = () => {
           <thead>
             <tr className="bg-gray-200">
               <th className="py-2 px-4 border-b">Date</th>
+              <th className="py-2 px-4 border-b">Time</th>
               <th className="py-2 px-4 border-b">Location</th>
               <th className="py-2 px-4 border-b">Type</th>
               <th className="py-2 px-4 border-b">Status</th>
@@ -23,11 +25,12 @@ const ExamsPage = () => {
             </tr>
           </thead>
           <tbody>
-            {exams.map((exam) => (
+            {sortedExams.map((exam) => (
               <tr key={exam._id}>
                 <td className="py-2 px-4 border-b">
                   {new Date(exam.date).toLocaleDateString()}
                 </td>
+                <td className="py-2 px-4 border-b">{exam.time}</td>
                 <td className="py-2 px-4 border-b">{exam.location}</td>
                 <td className="py-2 px-4 border-b capitalize">
                   {exam.examType}

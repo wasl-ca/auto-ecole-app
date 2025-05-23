@@ -1,9 +1,12 @@
+import { useAppContext } from "../context/AppContext";
+
 export default function RecentRegistrations() {
-    const registrations = [
-      { name: "Sarah M.", type: "Code", date: "2025-06-03" },
-      { name: "Omar B.", type: "Conduite", date: "2025-06-05" },
-      { name: "Lina T.", type: "Code", date: "2025-06-06" },
-    ];
+  // list of registred students in exams
+  const { exams } = useAppContext();
+  
+    // Flatten the array of registered students from all exams
+    // and map to get the required fields
+ const registeredStudents = exams.map((exam) => exam.registeredStudents).flat();
   
     return (
       <div className="mt-8 bg-white shadow rounded-xl p-4">
@@ -17,10 +20,20 @@ export default function RecentRegistrations() {
             </tr>
           </thead>
           <tbody>
-            {registrations.map((reg, idx) => (
+            {registeredStudents.length === 0 ? (
+              <tr>
+                <td colSpan="3" className="text-center py-4">
+                  No recent registrations
+                </td>
+              </tr>
+            ) : (
+              ""
+            )}
+            {/* Map through the registered students and display their details */}
+            {registeredStudents.map((reg, idx) => (
               <tr key={idx} className="border-b">
-                <td>{reg.name}</td>
-                <td>{reg.type}</td>
+                <td>{reg.fullName}</td>
+                <td>{reg.examType}</td>
                 <td>{reg.date}</td>
               </tr>
             ))}

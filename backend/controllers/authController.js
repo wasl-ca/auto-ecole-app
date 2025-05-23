@@ -1,5 +1,6 @@
 const jwt = require("jsonwebtoken");
 const User = require("../models/User");
+const menuByRole = require("../utils/menuByRole");
 
 exports.login = (req, res) => {
   const { username, password } = req.body;
@@ -23,6 +24,21 @@ exports.me = async (req, res) => {
     if (!user) return res.status(404).json({ message: "User not found" });
     res.json(user);
   } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
+
+exports.menu = async (req, res) => {
+  try {
+    const username = req.user.username; // Assuming username is set in the request by auth middleware
+    const user = await User.findOne({ username }, "-password");
+    if (!user) return res.status(404).json({ message: "User not found" });
+    console.log(user);
+    const role = user.role; // Assuming the user object has a role property
+    console.log(role);
+    const menu = menuByRole(role);
+    res.json({ menu });
+  } catch (err) {   
     res.status(500).json({ error: err.message });
   }
 };

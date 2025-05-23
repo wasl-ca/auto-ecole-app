@@ -1,13 +1,11 @@
 import { useAppContext } from "../context/AppContext";
-import AddStudentModal from "../components/AddStudentModal";
-import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { useEffect } from "react";
 
 export default function Students() {
   const { students, loading, fetchStudents } = useAppContext();
-  const [showModal, setShowModal] = useState(false);
 
-  const handleOpenModal = () => setShowModal(true);
-  const handleCloseModal = () => setShowModal(false);
+  const navigate = useNavigate();
   useEffect(() => {
     fetchStudents();
   }, []);
@@ -17,7 +15,7 @@ export default function Students() {
         <h1 className="text-2xl font-bold mb-4">Students</h1>
         <button
           className="bg-blue-600 text-white px-4 py-2 rounded-xl"
-          onClick={handleOpenModal}
+          onClick={() => navigate("/students/add")}
         >
           + Add Student
         </button>
@@ -74,9 +72,6 @@ export default function Students() {
               ))}
             </tbody>
           </table>
-          {showModal && (
-            <AddStudentModal open={showModal} onClose={handleCloseModal} />
-          )}
         </div>
       )}
     </div>
