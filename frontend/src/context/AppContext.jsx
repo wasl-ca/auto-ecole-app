@@ -15,6 +15,8 @@ export const AppProvider = ({ children }) => {
   const [students, setStudents] = useState([]);
   const [loading, setLoading] = useState(true);
   const [exams, setExams] = useState([]);
+  const [lessons, setLessons] = useState([]);
+  const [instructors, setInstructors] = useState([]);
 
   const fetchStudents = async () => {
     try {
@@ -27,6 +29,39 @@ export const AppProvider = ({ children }) => {
       console.error("Failed to load students", err);
       logout(); // optional: auto logout if token is invalid
     } finally {
+      setLoading(false);
+    }
+  };
+
+  const fetchInstructors = async () => {
+    try {
+      const config = { headers: { Authorization: `Bearer ${token}` } };
+
+      const instructorRes = await api.get("/users/role/instructor", config);
+
+      setInstructors(instructorRes.data);
+    } catch (err) {
+      console.error("Failed to load instructors", err);
+      logout(); // optional: auto logout if token is invalid
+    } finally {
+      setLoading(false);
+    }
+  };
+  
+
+  const fetchLessons = async () => {
+    try { 
+      const config = { headers: { Authorization: `Bearer ${token}` } };
+
+      const lessonRes = await api.get("/lessons", config);
+
+      setLessons(lessonRes.data);
+    }
+    catch (err) {
+      console.error("Failed to load lessons", err);
+      logout(); // optional: auto logout if token is invalid
+    }
+    finally {
       setLoading(false);
     }
   };
@@ -65,6 +100,8 @@ export const AppProvider = ({ children }) => {
       fetchStudents();
       fetchExams();
       fetchMenu(username);
+      fetchLessons();
+      fetchInstructors();
     } else {
       setLoading(false);
     }
@@ -85,6 +122,7 @@ export const AppProvider = ({ children }) => {
     const config = { headers: { Authorization: `Bearer ${data.token}` }, body  : { username } };
     const userRes = await api.get("/auth/me", config);
     setUser(userRes.data);
+    setLoading(false);
     return data;
   };
 
@@ -96,6 +134,9 @@ export const AppProvider = ({ children }) => {
     setUser(null);
     setStudents([]);
     setMenu([]);
+    setLessons([]);
+    setInstructors([]);
+    setExams([]);
   };
 
   return (
@@ -107,9 +148,12 @@ export const AppProvider = ({ children }) => {
         loading,
         exams,
         menu,
+        lessons,
+        instructors,
         login,
         logout, 
-        fetchStudents
+        fetchStudents,
+        fetchLessons
       }}
     >
       {children}

@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
+import { useTranslation } from "react-i18next";
+import { useNavigate } from "react-router-dom";
 
 const api = axios.create({
   baseURL: import.meta.env.VITE_APP_API_URL,
@@ -9,7 +11,8 @@ const ManageUsers = () => {
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-
+  const { t } = useTranslation();
+const navigate = useNavigate();
   const token = localStorage.getItem("token");
 
   const fetchUsers = async () => {
@@ -20,7 +23,7 @@ const ManageUsers = () => {
       setUsers(res.data);
       setLoading(false);
     } catch (err) {
-      setError("You are not authorized to view users.");
+      setError(t("error_not_authorized"));
       setLoading(false);
     }
   };
@@ -46,7 +49,7 @@ const ManageUsers = () => {
   const deleteUser = async (id) => {
     if (!window.confirm("Delete this user?")) return;
     try {
-      await axios.delete(`/api/users/${id}`, {
+      await api.delete(`/users/${id}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       fetchUsers();
@@ -61,7 +64,15 @@ const ManageUsers = () => {
 
   return (
     <div className="p-4">
-      <h2 className="text-xl font-bold mb-4">Manage Users</h2>
+      <div className="flex justify-between items-center mb-4">
+        <h2 className="text-xl font-bold mb-4">{t("manage_users")}</h2>
+        <button
+          className="bg-blue-600 text-white px-4 py-2 rounded-xl"
+          onClick={() => navigate("/users/add")}
+        >
+          {t("add_user")}
+        </button>
+      </div>
       <table className="w-full border text-sm">
         <thead>
           <tr className="bg-gray-200">
@@ -71,6 +82,13 @@ const ManageUsers = () => {
           </tr>
         </thead>
         <tbody>
+          {users.length === 0 && (
+            <tr>
+              <td colSpan="3" className="p-4 text-center">    
+                {t("users_empty")}
+              </td>
+            </tr>
+          )}
           {users.map((u) => (
             <tr key={u._id}>
               <td className="p-2 border">{u.username}</td>

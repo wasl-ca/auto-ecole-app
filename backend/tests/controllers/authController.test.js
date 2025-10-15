@@ -77,4 +77,39 @@ describe('authController', () => {
             expect(res.json).toHaveBeenCalledWith({ error: 'DB error' });
         });
     });
+    describe('menu', () => {
+        it('should return menu based on user role', async () => {
+            req.user = { username: 'test' };
+            const user = { username: 'test', role: 'admin' };
+            User.findOne.mockResolvedValue(user);
+            const mockMenu = [{ name: 'Dashboard' }];
+            const menuByRole = jest.requireActual('../../utils/menuByRole');
+            jest.spyOn(menuByRole, "default").mockReturnValue(mockMenu);
+
+            await authController.menu(req, res);
+
+            expect(User.findOne).toHaveBeenCalledWith({ username: 'test' }, '-password');
+            expect(res.json).toHaveBeenCalledWith({ menu: mockMenu });
+        });
+
+        it('should return 404 if user not found', async () => {
+            req.user = { username: 'test' };
+            User.findOne.mockResolvedValue(null);
+
+            await authController.menu(req, res);
+
+            expect(res.status).toHaveBeenCalledWith(404);
+            expect(res.json).toHaveBeenCalledWith({ message: 'User not found' });
+        });
+
+        it('should handle errors and return 500', async () => {
+            req.user = { username: 'test' };
+            User.findOne.mockRejectedValue(new Error('DB error'));
+
+            await authController.menu(req, res);
+
+            expect(res.status).toHaveBeenCalledWith(500);
+            expect(res.json).toHaveBeenCalledWith({ error: 'DB error' });
+        });
+    });
 });

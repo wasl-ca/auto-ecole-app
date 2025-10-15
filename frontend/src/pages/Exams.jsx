@@ -1,3 +1,4 @@
+import Loader from "../components/Loader";
 import { useAppContext } from "../context/AppContext";
 
 const ExamsPage = () => {
@@ -9,9 +10,7 @@ const ExamsPage = () => {
       <h1 className="text-2xl font-bold mb-4">Exam Schedule</h1>
 
       {loading ? (
-        <p>Loading...</p>
-      ) : exams.length === 0 ? (
-        <p>No exams available.</p>
+        <Loader />
       ) : (
         <table className="min-w-full bg-white border rounded shadow-md">
           <thead>
@@ -24,7 +23,14 @@ const ExamsPage = () => {
               <th className="py-2 px-4 border-b">Registered Students</th>
             </tr>
           </thead>
-          <tbody>
+              <tbody>
+                {exams.length === 0 && (
+                  <tr>
+                    <td colSpan="6" className="text-center py-4">
+                      No exams available.
+                    </td>
+                  </tr>
+                )}
             {sortedExams.map((exam) => (
               <tr key={exam._id}>
                 <td className="py-2 px-4 border-b">

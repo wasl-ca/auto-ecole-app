@@ -7,8 +7,12 @@ import Login from "./pages/Login";
 import ProtectedRoute from "./components/ProtectedRoute";
 import ManageUsers from "./pages/ManageUsers";
 import AddStudentPage from "./pages/AddStudent";
+import AddUserPage from "./pages/AddUser";
 import { useTranslation } from "react-i18next";
 import { useEffect } from "react";
+import LessonsPage from "./pages/Lessons";
+import AddLessonPage from "./pages/AddLesson";
+import "./App.css"; // Ensure you have your styles imported
 
 export default function App() {
   const { i18n } = useTranslation();
@@ -39,6 +43,22 @@ export default function App() {
             }
           />
           <Route
+            path="/lessons"
+            element={
+              <ProtectedRoute>
+                <LessonsPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/lessons/add"
+            element={
+              <ProtectedRoute>
+                <AddLessonPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
             path="/students/add"
             element={
               <ProtectedRoute>
@@ -61,6 +81,14 @@ export default function App() {
             element={
               <ProtectedRoute>
                 <ManageUsers />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/users/add"
+            element={
+              <ProtectedRoute>
+                <AddUserPage />
               </ProtectedRoute>
             }
           />

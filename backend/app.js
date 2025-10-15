@@ -15,5 +15,6 @@ app.use("/api/students", require("./routes/students"));
 app.use("/api/exams", require("./routes/exams"));
 app.use("/api/attt", require("./routes/attt"));
 app.use("/api/users", require("./routes/users"));
+app.use("/api/lessons", require("./routes/lessons"));
 
 module.exports = app;

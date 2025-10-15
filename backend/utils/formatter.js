@@ -1,3 +1,7 @@
+const dayjs = require("dayjs");
+const customParseFormat = require("dayjs/plugin/customParseFormat");
+dayjs.extend(customParseFormat);
+
 function getLocation(location) {
     const locationMap = {
       Zarzis: "Zarzis",
@@ -40,5 +44,13 @@ function getLocation(location) {
     const [day, month, year] = datePart.split("/");
       return { datePart: new Date(`${year}-${month}-${day}`), timePart: timePart };
   }
+  function parseTimeToDate(dateStr, timeStr) {
+    const [hours, minutes] = timeStr.split(":").map(Number);
+    const date = new Date(dateStr);
+    date.setHours(hours, minutes, 0, 0);
+    const parsed = dayjs(`${dateStr} ${timeStr}`, "YYYY-MM-DD HH:mm", true);
+    console.log("Parsed date:", parsed.format());
+    return parsed.isValid() ? parsed.toDate() : null;
+  }
 
-  module.exports = { getLocation, getExamType, parseDateTime };
+  module.exports = { getLocation, getExamType, parseDateTime, parseTimeToDate };

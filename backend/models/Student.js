@@ -1,21 +1,10 @@
 const mongoose = require("mongoose");
 
 const studentSchema = new mongoose.Schema({
-  examRegistered: { type: Boolean, default: false },
-  fullName: {
-    type: String,
+  userId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "User",
     required: true,
-  },
-  email: {
-    type: String,
-    unique: true,
-    sparse: true,
-  },
-  phone: {
-    type: String,
-  },
-  address: {
-    type: String,
   },
   dateOfBirth: {
     type: Date,
@@ -32,6 +21,11 @@ const studentSchema = new mongoose.Schema({
     enum: ["code", "conduite", "manoeuvre"],
     default: "code",
   },
+  status: {
+    type: String,
+    enum: ["registered", "not_registered", "cancelled", "ready_for_exam", "learning", "exam_failed", "exam_passed"],
+    default: "learning",
+  },
   prefferredExamDate: {
     type: Date,
   },
@@ -40,6 +34,12 @@ const studentSchema = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: "Exam",
   },
+  lessons: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Lesson",
+    },
+  ],
 });
 
 module.exports = mongoose.model("Student", studentSchema);
